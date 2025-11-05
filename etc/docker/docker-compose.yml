@@ -1,0 +1,62 @@
+services:
+  baitapabp-web:
+    image: baitapabp:latest
+    container_name: baitapabp
+    build:
+      context: ../../
+      dockerfile: baitapabp/Dockerfile.local
+    environment:
+      - ASPNETCORE_URLS=https://+:8081;http://+:8080;
+      - Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
+      - Kestrel__Certificates__Default__Password=91f91912-5ab0-49df-8166-23377efaf3cc
+      - App__HealthCheckUrl=http://baitapabp:8080/health-status
+      - ConnectionStrings__Default=Server=mysql;Port=3306;Userid=root;Password=myPassw0rd;Database=baitapabp;
+    ports:
+      - "44362:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: on-failure  
+    volumes:
+      - ./certs:/app/certs
+    networks:
+      - abp-network  
+  
+  db-migrator:
+    image: baitapabp:latest
+    container_name: db-migrator
+    build:
+      context: ../../
+      dockerfile: baitapabp/Dockerfile.local
+    environment:
+      - ConnectionStrings__Default=Server=mysql;Port=3306;Userid=root;Password=myPassw0rd;Database=baitapabp;
+    command:
+      - --migrate-database
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - abp-network
+  mysql:
+    container_name: mysql-db
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: myPassw0rd
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - abp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  mysql_data:
+    name: baitapabp_mysql_data
+networks:
+  abp-network:
+    name: baitapabp-network
+    driver: bridge

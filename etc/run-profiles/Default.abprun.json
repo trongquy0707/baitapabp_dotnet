@@ -1,0 +1,28 @@
+﻿{
+  "applications": {
+    "baitapabp": {
+      "type": "dotnet-project",
+      "launchUrl": "https://localhost:44362",
+      "healthCheckEndpoint": "/health-status",
+      "healthUiEndpoint": "/health-ui",
+      "path": "../../baitapabp/baitapabp.csproj",
+      "execution": {
+        "order": 0
+      }
+    }
+  },
+  "tasks": {
+    "Initialize Solution":{
+    "type": "cli",
+    "runOnSolutionOpen": true,
+    "startCommand": "etc/scripts/initialize-solution.ps1", 
+    "workingDirectory": "../../"
+    },
+    "Migrate Database":{
+    "type": "cli",
+    "runOnSolutionOpen": false,
+    "startCommand": "etc/scripts/migrate-database.ps1",
+    "workingDirectory": "../../"
+    }
+  } 
+}

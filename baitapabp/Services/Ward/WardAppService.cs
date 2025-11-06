@@ -10,6 +10,7 @@ using baitapabp.Services.Dtos;
 
 namespace baitapabp.Services.Ward
 {
+    [Authorize]
     public class WardAppService : CrudAppService<
             WardsEntity,
             WardsDto,
@@ -29,7 +30,7 @@ namespace baitapabp.Services.Ward
             _wardsRepository = wardsRepository;
             _provinceRepository = provinceRepository;
         }
-
+        [Authorize(Roles= "employee")]
         public async Task<List<WardsDto>> GetByProvinceCodeAsync(string provinceCode)
         {
             var wards = await _wardsRepository.GetListAsync(w => w.provinceCode == provinceCode);

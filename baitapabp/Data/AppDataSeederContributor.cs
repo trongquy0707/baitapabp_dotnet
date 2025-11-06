@@ -23,7 +23,6 @@ namespace baitapabp.Data.Seed
         [UnitOfWork]
         public async Task SeedAsync(DataSeedContext context)
         {
-            // --- Tạo ROLE ---
             var adminRole = await _roleManager.FindByNameAsync("admin");
             if (adminRole == null)
             {
@@ -38,7 +37,6 @@ namespace baitapabp.Data.Seed
                 await _roleManager.CreateAsync(employeeRole);
             }
 
-            // --- Tạo USER admin ---
             var adminUser = await _userManager.FindByNameAsync("admin");
             if (adminUser == null)
             {
@@ -46,9 +44,11 @@ namespace baitapabp.Data.Seed
                     Guid.NewGuid(),
                     "admin",
                     "admin@local.com"
+
                 );
-                adminUser.SetIsActive(true); 
                 adminUser.SetEmailConfirmed(true);
+                adminUser.SetIsActive(true); 
+                
 
                 var result = await _userManager.CreateAsync(adminUser, "123456aA@");
                 if (result.Succeeded)
@@ -60,8 +60,12 @@ namespace baitapabp.Data.Seed
                     Console.WriteLine(string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
+            if (adminUser != null)
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(adminUser);
+                await _userManager.ResetPasswordAsync(adminUser, token, "123456aA@");
+            }
 
-            // --- Tạo USER employee ---
             var employeeUser = await _userManager.FindByNameAsync("employee");
             if (employeeUser == null)
             {

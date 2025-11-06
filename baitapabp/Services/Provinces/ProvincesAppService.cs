@@ -9,7 +9,7 @@ using Volo.Abp;
 namespace baitapabp.Services.Provinces
 {
     [RemoteService(Name = "provinces")]
-    //[Authorize]
+    [Authorize]
     public class ProvincesAppService : CrudAppService<ProvincesEntity, ProvincesDto, int, ProvincesPagedRequestDto, CreateUpdateProvincesDto>, IProvincesAppService
     {
         private readonly IRepository<ProvincesEntity, int> _repositoryProvinces;
@@ -31,7 +31,7 @@ namespace baitapabp.Services.Provinces
 
             return true;
         }
-        //[Authorize(Roles = "employee")]
+        [Authorize(Roles = "employee")]
         protected override async Task<IQueryable<ProvincesEntity>> CreateFilteredQueryAsync(ProvincesPagedRequestDto input)
         {
             var query = await base.CreateFilteredQueryAsync(input);
@@ -49,7 +49,7 @@ namespace baitapabp.Services.Provinces
         [RemoteService(false)]
         public override Task<ProvincesDto> UpdateAsync(int id, CreateUpdateProvincesDto input)
             => throw new NotImplementedException();
-
+        [Authorize(Roles = "admin")]
         [HttpPost]
         [Route("provinces/create-or-update")]
         public async Task<ProvincesDto> CreateOrUpdateAsync(CreateUpdateProvincesDto input)

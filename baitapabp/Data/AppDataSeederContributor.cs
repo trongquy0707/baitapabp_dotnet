@@ -50,7 +50,7 @@ namespace baitapabp.Data.Seed
                 adminUser.SetIsActive(true); 
                 
 
-                var result = await _userManager.CreateAsync(adminUser, "123456aA@");
+                var result = await _userManager.CreateAsync(adminUser, "123456Aa@");
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(adminUser, "admin");
@@ -63,7 +63,7 @@ namespace baitapabp.Data.Seed
             if (adminUser != null)
             {
                 var token = await _userManager.GeneratePasswordResetTokenAsync(adminUser);
-                await _userManager.ResetPasswordAsync(adminUser, token, "123456aA@");
+                await _userManager.ResetPasswordAsync(adminUser, token, "123456Aa@");
             }
 
             var employeeUser = await _userManager.FindByNameAsync("employee");

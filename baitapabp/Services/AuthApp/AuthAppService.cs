@@ -7,6 +7,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Guids;
 using Volo.Abp.Identity;
 using Volo.Abp;
+using Volo.Abp.Account;
 
 namespace baitapabp.Services.AuthApp
 {
@@ -47,7 +48,7 @@ namespace baitapabp.Services.AuthApp
             };
         }
 
-        public async Task<Microsoft.AspNetCore.Identity.IdentityResult> RegisterAsync(Volo.Abp.Account.RegisterDto dto)
+        public async Task<RegisterResultDto> RegisterAsync(RegisterDto dto)
         {
             if (await _userManager.FindByNameAsync(dto.UserName) != null)
                 throw new UserFriendlyException("Tên đăng nhập đã tồn tại.");
@@ -60,7 +61,12 @@ namespace baitapabp.Services.AuthApp
             {
                 await _userManager.AddToRoleAsync(user, "Employee");
             }
-            return result;
+            return new RegisterResultDto
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Message = "Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản."
+            } ;
         }
 
         private async Task<(string Token, DateTime ExpireAt)> GenerateJwtTokenAsync(IdentityUser user, IList<string> roles)

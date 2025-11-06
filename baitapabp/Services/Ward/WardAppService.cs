@@ -33,6 +33,7 @@ namespace baitapabp.Services.Ward
         [Authorize(Roles= "employee")]
         public async Task<List<WardsDto>> GetByProvinceCodeAsync(string provinceCode)
         {
+
             var wards = await _wardsRepository.GetListAsync(w => w.provinceCode == provinceCode);
             return ObjectMapper.Map<List<WardsEntity>, List<WardsDto>>(wards);
         }
@@ -54,6 +55,7 @@ namespace baitapabp.Services.Ward
             if (wardCodeExists)
                 throw new UserFriendlyException($"Mã phường/xã '{input.Code}' đã được dùng ở bản ghi khác!");
         }
+        [Authorize(Roles = "admin")]
         [HttpPost("Ward/create-or-update")]
         public async Task<WardsDto> CreateOrUpdateAsync(CreateUpdateWardsDto input)
         {
@@ -74,31 +76,33 @@ namespace baitapabp.Services.Ward
 
             return ObjectMapper.Map<WardsEntity, WardsDto>(entity);
         }
-
+        [Authorize(Roles = "employee")]
         public override async Task<WardsDto> GetAsync(int id)
         {
             var entity = await _wardsRepository.GetAsync(id);
+
             if (entity == null)
                 throw new UserFriendlyException($"Không tìm thấy dữ liệu với Id = {id}");
             var dto = ObjectMapper.Map<WardsEntity, WardsDto>(entity);
+
             var province = await _provinceRepository.FirstOrDefaultAsync(p => p.Code == entity.provinceCode);
             dto.ProvinceName = province?.Name;
+
             return dto;
         }
-
+        [Authorize(Roles = "admin")]
         public override async Task DeleteAsync(int id)
         {
             var entity = await _wardsRepository.FindAsync(id);
+
             if (entity == null)
                 throw new UserFriendlyException($"Không tìm thấy dữ liệu với Id = {id}");
-
             await _wardsRepository.DeleteAsync(entity);
         }
-
+        [Authorize(Roles = "employee")]
         public override async Task<PagedResultDto<WardsDto>> GetListAsync(WardsPagedRequestDto input)
         {
             var query = await _wardsRepository.GetQueryableAsync();
-
             if (!string.IsNullOrWhiteSpace(input.SearchKey))
             {
                 query = query.Where(x =>

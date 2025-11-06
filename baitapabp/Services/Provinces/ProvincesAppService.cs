@@ -59,15 +59,32 @@ namespace baitapabp.Services.Provinces
             {
                 throw new UserFriendlyException($"Mã Tỉnh/Thành phố '{input.Code}' đã được dùng ở bản ghi khác!");
             }
+            ProvincesDto result;
             if (input.Id == 0)
             {
-                return await base.CreateAsync(input);
+                result = await base.CreateAsync(input);
             }
             else
             {
-                return await base.UpdateAsync(input.Id, input);
+                var oldProvince = await _repositoryProvinces.GetAsync(input.Id);
+                var oldCode = oldProvince.Code;
+
+                   result = await base.UpdateAsync(input.Id, input);
+
+                if (!string.Equals(oldCode, input.Code, StringComparison.OrdinalIgnoreCase))
+                {
+                    var wards = await _repositoryWards.GetListAsync(x => x.provinceCode == oldCode);
+                    foreach (var ward in wards)
+                    {
+                        ward.provinceCode = input.Code;
+                        await _repositoryWards.UpdateAsync(ward);
+                    }
+                }
             }
+
+            return result;
         }
+        [Authorize(Roles = "admin")]
         public override async Task DeleteAsync(int id)
         {
 

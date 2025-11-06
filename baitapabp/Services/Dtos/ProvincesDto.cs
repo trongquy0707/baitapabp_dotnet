@@ -15,6 +15,7 @@ namespace baitapabp.Services.Dtos
     [AutoMap(typeof(ProvincesEntity), ReverseMap = true)]
     public class CreateUpdateProvincesDto : EntityDto<int>
     {
+        [Required(ErrorMessage = "Mã tỉnh/thành phố không được để trống")]
         public string Code { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Tên tỉnh/thành phố không được để trống")]
